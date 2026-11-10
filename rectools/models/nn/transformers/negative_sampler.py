@@ -53,7 +53,19 @@ class CatalogUniformSampler(TransformerNegativeSamplerBase):
     ----------
     n_negatives : int
         Number of negatives.
+    avoid_positive_collisions : bool, default False
+        If True, redraw sampled negatives matching the positive
+        target at the same position. Redraw is performed once.
     """
+
+    def __init__(
+        self,
+        n_negatives: int,
+        avoid_positive_collisions: bool = False,
+        **kwargs: tp.Any,
+    ) -> None:
+        super().__init__(n_negatives=n_negatives, **kwargs)
+        self.avoid_positive_collisions = avoid_positive_collisions
 
     def get_negatives(
         self,
@@ -65,9 +77,22 @@ class CatalogUniformSampler(TransformerNegativeSamplerBase):
     ) -> torch.Tensor:
         """Return sampled negatives."""
         session_len = session_len_limit if session_len_limit is not None else batch_dict["x"].shape[1]
+
         negatives = torch.randint(
             low=lowest_id,
             high=highest_id,
             size=(batch_dict["x"].shape[0], session_len, self.n_negatives),
         )  # [batch_size, session_max_len, n_negatives]
+
+        if self.avoid_positive_collisions:
+            targets = batch_dict["y"]
+            collisions = (negatives == targets.unsqueeze(-1)) & (targets.unsqueeze(-1) != 0)
+
+            if collisions.any():
+                negatives[collisions] = torch.randint(
+                    low=lowest_id,
+                    high=highest_id,
+                    size=(int(collisions.sum().item()),),
+                )
+
         return negatives

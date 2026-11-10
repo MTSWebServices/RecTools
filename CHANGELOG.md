@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `align_embeddings()` for mapping pretrained embedding matrices to internal item ID order ([#306](https://github.com/MTSWebServices/RecTools/pull/306))
 - `SequenceBatchDataset` — lightweight torch Dataset wrapper for sequence training data ([#306](https://github.com/MTSWebServices/RecTools/pull/306))
 - Configurable FFN blocks in `UniSRecNet`: `conv1d` (original paper), `linear_gelu`, `linear_relu` with adjustable expansion factor ([#306](https://github.com/MTSWebServices/RecTools/pull/306))
-
+- Optional `avoid_positive_collisions` parameter in `CatalogUniformSampler` to redraw negative samples that collide with positive targets.
 
 ## [0.18.0] - 21.02.2026
 
