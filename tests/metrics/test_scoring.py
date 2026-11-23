@@ -48,6 +48,19 @@ from rectools.metrics.base import MetricAtK
 
 
 class TestCalcMetrics:  # pylint: disable=attribute-defined-outside-init
+    @pytest.mark.parametrize("config", [None, DebiasConfig(iqr_coef=0, random_state=42)])
+    def test_repeated_test_interactions(self, config: tp.Optional[DebiasConfig]) -> None:
+        reco = pd.DataFrame({Columns.User: [1, 2, 3, 4, 5], Columns.Item: [10, 10, 13, 10, 10], Columns.Rank: [1] * 5})
+        interactions = pd.DataFrame(
+            {Columns.User: [1, 2, 3, 4, 5, 1, 2, 3], Columns.Item: [10, 10, 10, 10, 10, 11, 12, 13]}
+        )
+        repeated = pd.concat([interactions, interactions.iloc[[0, 0, 2, 5]]], ignore_index=True)
+        metrics = {"precision": Precision(1, config), "recall": Recall(1, config), "map": MAP(1, config)}
+        expected = calc_metrics(metrics, reco, interactions)
+        assert calc_metrics(metrics, reco, repeated) == pytest.approx(expected)
+        for name, metric in metrics.items():
+            assert metric.calc(reco, repeated) == pytest.approx(expected[name])
+
     def setup_method(self) -> None:
         self.reco = pd.DataFrame(
             {

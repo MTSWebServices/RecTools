@@ -89,7 +89,7 @@ class ClassificationMetric(DebiasableMetrikAtK):
         """
         is_debiased = False
         if self.debias_config is not None:
-            interactions = debias_interactions(interactions, self.debias_config)
+            interactions = debias_interactions(interactions.drop_duplicates(Columns.UserItem), self.debias_config)
             is_debiased = True
 
         self._check(reco, interactions=interactions)
@@ -205,7 +205,7 @@ class SimpleClassificationMetric(DebiasableMetrikAtK):
         """
         is_debiased = False
         if self.debias_config is not None:
-            interactions = debias_interactions(interactions, self.debias_config)
+            interactions = debias_interactions(interactions.drop_duplicates(Columns.UserItem), self.debias_config)
             is_debiased = True
 
         self._check(reco, interactions=interactions)

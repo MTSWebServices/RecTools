@@ -80,7 +80,7 @@ class MetricAtK:
 
 def merge_reco(reco: pd.DataFrame, interactions: pd.DataFrame) -> pd.DataFrame:
     """
-    Merge recommendation table with interactions table.
+    Merge recommendation ranks with distinct relevant user-item pairs.
 
     Parameters
     ----------
@@ -95,7 +95,7 @@ def merge_reco(reco: pd.DataFrame, interactions: pd.DataFrame) -> pd.DataFrame:
         Result of merging.
     """
     merged = pd.merge(
-        interactions.reindex(columns=Columns.UserItem),
+        interactions.reindex(columns=Columns.UserItem).drop_duplicates(),
         reco.reindex(columns=Columns.UserItem + [Columns.Rank]),
         on=Columns.UserItem,
         how="left",
