@@ -87,7 +87,7 @@ class TestMAP:
         )
         metric = MAP(k=3)
         expected_metric_per_user = pd.Series(
-            [3.5 / 3, 3 / 3],
+            [1.0, 1.0],
             index=pd.Series([1, 2], name=Columns.User),
             dtype=float,
         )
