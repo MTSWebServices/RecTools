@@ -122,13 +122,14 @@ def get_from_series_by_index(
         raise ValueError("You can't use `strict` and `return_missing` together")
 
     r = series.reindex(ids)
+    missing_ids_mask = series.index.get_indexer(np.asarray(ids)) == -1
     if strict:
-        if r.isna().any():
+        if missing_ids_mask.any():
             raise KeyError("Some indices do not exist")
     else:
         if return_missing:
-            missing = r[r.isna()].index.values
-        r.dropna(inplace=True)
+            missing = np.asarray(ids)[missing_ids_mask]
+        r = r[~missing_ids_mask]
     selected = r.astype(series.dtype).values
 
     if return_missing:
