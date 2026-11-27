@@ -39,6 +39,21 @@ class TestGetElementIds:
             get_element_ids(np.array([2, 5, 3, 8]), np.array([]))
 
 
+def test_get_from_series_by_index_with_nan_values() -> None:
+    s = pd.Series([40.0, np.nan, 20.0], index=[4, 2, 1])
+    ids = np.array([1, 2, 4])
+    actual = get_from_series_by_index(s, ids)
+    np.testing.assert_equal(actual, np.array([20.0, np.nan, 40.0]))
+
+
+def test_get_from_series_by_index_with_nan_values_strict_false() -> None:
+    s = pd.Series([40.0, np.nan, 20.0], index=[4, 2, 1])
+    ids = np.array([1, 2, 3])
+    values, missing = get_from_series_by_index(s, ids, strict=False, return_missing=True)
+    np.testing.assert_equal(values, np.array([20.0, np.nan]))
+    np.testing.assert_equal(missing, np.array([3]))
+
+
 @pytest.mark.parametrize("index_type", ("int64", "str"))
 @pytest.mark.parametrize("value_type", ("int64", "str"))
 class TestGetFromSeriesByIndex:

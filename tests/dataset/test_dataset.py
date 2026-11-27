@@ -356,6 +356,20 @@ class TestDataset:
             expected.drop(columns="extra_col", inplace=True)
         pd.testing.assert_frame_equal(actual, expected)
 
+    def test_get_raw_interactions_with_nan_user_id(self) -> None:
+        df = pd.DataFrame(
+            {
+                Columns.User: ["u1", None, "u2"],
+                Columns.Item: ["i1", "i2", "i3"],
+                Columns.Weight: [1.0, 2.0, 3.0],
+                Columns.Datetime: pd.to_datetime(["2021-09-09"] * 3),
+            }
+        )
+        dataset = Dataset.construct(df)
+        actual = dataset.get_raw_interactions()
+        expected = df.copy()
+        pd.testing.assert_frame_equal(actual, expected)
+
     @pytest.fixture
     def dataset_to_filter(self) -> Dataset:
         item_id_map = IdMap.from_values([10, 20, 30, 40, 50])
